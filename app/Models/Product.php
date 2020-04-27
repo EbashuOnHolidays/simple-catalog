@@ -9,16 +9,19 @@ use Illuminate\Database\Eloquent\Model;
  * Class Product
  *
  * @package App\Models
- * @property integer $id
- * @property string  $name
- * @property string  $desc
- * @property float   $price
- * @property Carbon  $created_at
- * @property Carbon  $updated_at
+ * @property integer  $id
+ * @property integer  $category_id
+ * @property string   $name
+ * @property string   $desc
+ * @property float    $price
+ * @property Carbon   $created_at
+ * @property Carbon   $updated_at
+ * @property Category $category
  */
 class Product extends Model
 {
     protected $fillable = [
+        'category_id',
         'name',
         'desc',
         'price',
