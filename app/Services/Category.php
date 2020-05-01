@@ -13,7 +13,7 @@ class Category
     public function getAll()
     {
         return CategoryModel::query()
-            ->orderBy('name', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
     }
 
