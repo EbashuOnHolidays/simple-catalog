@@ -1,9 +1,14 @@
 <template>
-  <div class="row justify-content-center">
-    <ProductListItem v-for="item in products" v-bind:data="item" v-bind:key="item.id" @onUpdate="onUpdateItem" @onDelete="onDeleteItem"/>
+  <div class="row">
+    <div class="col-12 text-right mb-4">
+      <button class="btn btn-success btn-sm" @click="onShowCreateModal">Добавить товар</button>
+    </div>
 
-    <ProductCreate/>
-    <ProductUpdate :id="productId"/>
+    <!--    TODO: Здесь бы хорошо работать с событиями по шине событий Bus, но так как это тестовое - оставлю как уже сделано-->
+    <ProductListItem v-for="item in products" v-bind:data="item" v-bind:key="item.id" @onUpdate="onShowUpdateModal" @onDelete="onDeleteItem"/>
+
+    <ProductCreate :isShow="showCreateModal" @onUpdate="onCreateItem" @onClose="onCloseCreateModal"/>
+    <ProductUpdate :isShow="showUpdateModal" :product="product" @onUpdate="onUpdateItem" @onClose="onCloseUpdateModal"/>
   </div>
 </template>
 
@@ -17,33 +22,58 @@
     components: {
       ProductUpdate,
       ProductCreate,
-      ProductListItem},
+      ProductListItem
+    },
     data: () => ({
+      showCreateModal: false,
+      showUpdateModal: false,
+
       products: [],
 
-      productId: null
+      product: {}
     }),
     methods: {
       loadProducts(page = 1) {
-        axios.get(`products`)
-          .then(response => {
-            this.products = response.data
-          }, {
+        axios.get(`products`, {
             params: {
               page: page
             }
           })
+          .then(response => {
+            this.products = response.data
+
+            this.showCreateModal = false
+            this.showUpdateModal = false
+          })
+      },
+      loadProduct(id) {
+        // TODO: Можно вынести в отдельный JS файл и вызывать оттуда
+        return axios.get(`products/${id}`)
+      },
+      onShowCreateModal() {
+        this.showCreateModal = true
+      },
+      onShowUpdateModal(id) {
+        this.loadProduct(id)
+          .then(response => {
+            this.showUpdateModal = true
+            this.product = response.data
+          })
+      },
+      onCreateItem() {
+        this.loadProducts()
       },
       onUpdateItem(id) {
-        this.productId = id
+        this.loadProducts()
       },
       onDeleteItem(id) {
-        axios.delete(`products/${id}`)
-          .then(response => {
-            console.log('OKAY')
-
-            this.loadProducts()
-          })
+        this.loadProducts()
+      },
+      onCloseCreateModal() {
+        this.showCreateModal = false
+      },
+      onCloseUpdateModal() {
+        this.showUpdateModal = false
       }
     },
     mounted() {

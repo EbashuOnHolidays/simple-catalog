@@ -1,24 +1,35 @@
 <template>
-  <div v-if="isVisible" class="modal show">
+  <div v-if="isShow" class="modal show">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Update product</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title">Редактировать товар</h5>
+          <button type="button" class="close" @click="onClose">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-<!--            <label for="category_id">Категория</label>-->
-<!--            <select id="category_id" v-model="product.category_id">-->
-<!--              <option></option>-->
-<!--            </select>-->
+            <label for="category_id">Категория</label>
+            <select id="category_id" v-model="productRecord.category_id" class="form-control">
+              <option v-for="category in categories" :value="category.id">{{ category.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="name">Название товара</label>
+            <input id="name" v-model="productRecord.name" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="desc">Описание товара</label>
+            <textarea id="desc" v-model="productRecord.desc" class="form-control" rows="5"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="price">Цена товара</label>
+            <input id="price" v-model="productRecord.price" class="form-control">
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" class="btn btn-success" @click="onUpdate">Сохранить товар</button>
         </div>
       </div>
     </div>
@@ -29,40 +40,47 @@
   export default {
     name: 'ProductUpdate',
     props: {
-      id: {
+      isShow: {
+        type: Boolean,
+        default: false
+      },
+      product: {
         required: true
       }
     },
     data: () => ({
-      product: {
-        category_id: null
+      categories: [],
+      productRecord: {
+        category_id: null,
+        name: null,
+        desc: null,
+        price: 0
       }
     }),
     methods: {
+      onClose() {
+        this.$emit('onClose')
+      },
       onUpdate() {
-        this.$emit('onUpdate', this.data.id)
-      },
-      loadRecord() {
-        axios.get(`products/${this.id}`)
+        axios.put(`products/${this.product.id}`, this.productRecord)
           .then(response => {
-            this.product = response.data
-          })
-          .catch(error => {
+            this.$emit('onUpdate', this.product.id)
           })
       },
-    },
-    computed: {
-      isVisible() {
-        return !_.isNull(this.id) && !_.isNull(this.product)
+      loadCategories() {
+        axios.get(`categories`)
+          .then(response => {
+            this.categories = response.data
+          })
       }
     },
     watch: {
-      id: function (newVal, oldVal) {
-        // if (!_.isEmpty(newVal)) {
-          this.product = null
+      product: function (newVal, oldVal) {
+        if (newVal !== null) {
+          this.productRecord = newVal
 
-          this.loadRecord()
-        // }
+          this.loadCategories()
+        }
       }
     }
   }

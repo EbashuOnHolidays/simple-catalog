@@ -21,6 +21,10 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+//Route::get('categories', function () {
+//    return view('catalog.category.index');
+//});
+
 Route::get('products', function () {
     return view('catalog.product.index');
 });

@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 class Product
 {
     /**
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
     public function getAll()
     {
         return ProductModel::query()
             ->with('category')
-            ->paginate();
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
 
     /**

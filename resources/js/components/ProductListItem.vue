@@ -12,8 +12,8 @@
 
         <p>${{ data.price }}</p>
 
-        <button class="btn btn-warning btn-sm" @click="onUpdate">Edit</button>
-        <button class="btn btn-danger btn-sm" @click="onDelete">Delete</button>
+        <button class="btn btn-warning btn-sm" @click="onUpdate">Редактировать</button>
+        <button class="btn btn-danger btn-sm" @click="onDelete">Удалить</button>
       </div>
     </div>
   </div>
@@ -33,7 +33,12 @@
         this.$emit('onUpdate', this.data.id)
       },
       onDelete() {
-        this.$emit('onDelete', this.data.id)
+        if (confirm('Удалить товар?')) {
+          axios.delete(`products/${this.data.id}`)
+            .then(response => {
+              this.$emit('onDelete', this.data.id)
+            })
+        }
       }
     }
   }
